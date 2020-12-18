@@ -1,11 +1,10 @@
 // @see https://www.themealdb.com/
-
-const searchBtnEl = document.getElementById("search");
-const submitBtnEl = document.getElementById("submit");
+const searchEl = document.getElementById("search");
+const submitEl = document.getElementById("submit");
 const randomBtnEl = document.getElementById("random");
 const mealsEl = document.getElementById("meals");
 const resultHeadingEl = document.getElementById("result-heading");
-const singleMealEl = document.getElementsByTagName("single-meal");
+const singleMealEl = document.getElementById("single-meal");
 
 // Search meal and fetch from API
 function searchMeal(e) {
@@ -15,7 +14,7 @@ function searchMeal(e) {
   singleMealEl.innerHTML = "";
 
   // Get search term
-  const searchTerm = searchBtnEl.value;
+  const searchTerm = searchEl.value;
 
   // Check for empty
   if (!searchTerm.trim()) return alert("Please enter a search term");
@@ -41,8 +40,68 @@ function searchMeal(e) {
     });
 
   // Clear search text
-  searchBtnEl.value = "";
+  searchEl.value = "";
+}
+
+// Add meal to DOM
+function addMealToDOM(meal) {
+  const ingredients = [];
+
+  for (let i = 1; i <= 20; i += 1) {
+    if (!meal[`strIngredient${i}`]) break;
+
+    ingredients.push(
+      `${meal[`strIngredient${i}`]} - ${meal[`strMeasure${i}`]}`
+    );
+  }
+
+  singleMealEl.innerHTML = `
+      <h1>${meal.strMeal}</h1>  
+      <img src="${meal.strMealThumb}" alt="${meal.strMeal}"/>
+      <div class="single-meal-info">
+        ${meal.strCategory ? `<p>${meal.strCategory}</p>` : ""}
+        ${meal.strArea ? `<p>${meal.strArea}</p>` : ""}
+      </div>
+      <div class="main">
+        ${meal.strInstruction ? `<p>${meal.strInstruction}</p>` : ""}
+        <h2>Ingredients</h2>
+        <ul>
+          ${ingredients.map((ingredient) => `<li>${ingredient}</li>`).join("")}
+        </ul>
+      </div>
+  `;
+}
+
+// Fetch random meal from API
+function getRandomMeal() {
+  // Clear meals and heading
+  mealsEl.innerHTML = "";
+  resultHeadingEl.innerHTML = "";
+
+  fetch(`https://www.themealdb.com/api/json/v1/1/random.php`)
+    .then((res) => res.json())
+    .then((data) => addMealToDOM(data.meals[0]));
+}
+
+// Fetch meal by ID
+function getMealById(mealId) {
+  fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`)
+    .then((res) => res.json())
+    .then((data) => addMealToDOM(data.meals[0]));
 }
 
 // Event listeners
-submitBtnEl.addEventListener("submit", searchMeal);
+submitEl.addEventListener("submit", searchMeal);
+randomBtnEl.addEventListener("click", getRandomMeal);
+
+mealsEl.addEventListener("click", (e) => {
+  const mealInfo = e.path.find(
+    (item) => item.classList && item.classList.contains("meal-info")
+  );
+
+  if (!mealInfo) return;
+
+  const mealId = mealInfo.getAttribute("data-mealid");
+
+  getMealById(mealId);
+});
