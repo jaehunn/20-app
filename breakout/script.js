@@ -15,8 +15,10 @@ const BRICK_COL = 5;
 
 // Create ball props
 const ball = {
+  // center
   x: canvasEl.width / 2,
   y: canvasEl.width / 2,
+
   size: 10,
   dx: 4,
   dy: -4, // up
@@ -25,8 +27,10 @@ const ball = {
 
 // Create paddle props
 const paddle = {
+  // center
   x: canvasEl.width / 2 - 40,
   y: canvasEl.height - 20,
+
   width: 80,
   height: 10,
   dx: 0, // dy(x) horizontal
@@ -38,6 +42,7 @@ const brickInfo = {
   width: 70,
   height: 20,
   padding: 10,
+
   offsetX: 45,
   offsetY: 60,
   visible: true,
@@ -177,7 +182,6 @@ function drawBricks() {
 // Draw ball on canvas
 function drawBall() {
   ctx.beginPath();
-
   ctx.arc(ball.x, ball.y, ball.size, 0, Math.PI * 2); // x y size start-angle end-angle
   ctx.fillStyle = "#0095dd";
   ctx.fill();
